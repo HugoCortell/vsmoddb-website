@@ -9,7 +9,7 @@
 						(<a href="#r" onclick="return false;">respond</a>&nbsp;<a href="#e" onclick="return false;">edit</a>&nbsp;<a href="#d" onclick="return false;">delete</a>)
 					{/if}
 				{elseif canModerate($comment['userId'], $user) && !($comment["userId"] == $user["userId"])}
-						(<a href="#r" onclick="return false;">respond</a>&nbsp;{if !$comment['deleted']}<a href="#e" onclick="return false;">edit</a>&nbsp;<a href="#d" onclick="return false;">delete</a>&nbsp;{/if}<a href="/moderat{$comment['userHash']}?source-comment={$comment['commentId']}">moderate user</a>)</span>
+						(<a href="#r" onclick="return false;">respond</a>&nbsp;{if !$comment['deleted']}<a href="#e" onclick="return false;">edit</a>&nbsp;<a href="#d" onclick="return false;">delete</a>&nbsp;{/if}<a href="/moderate/user/{$comment['userHash']}?source-comment={$comment['commentId']}">moderate user</a>)</span>
 				{elseif $asset['createdByUserId'] == $user['userId'] && !$comment['deleted']}
 						(<a href="#r" onclick="return false;">respond</a>&nbsp;<a href="#d" onclick="return false;">delete</a>)
 				{else}
