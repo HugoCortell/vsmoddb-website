@@ -623,7 +623,7 @@ function escapeStringForLikeQuery($str)
 /** Inflates links and creates spoiler elements.
  * @param string $html
  */
-function postprocessCommentHtml($html)
+function postprocessCommentHtml($html) //TODO(Rennorb) @cleanup: move this to ingest.
 {
 	// http:///..... => Create a link from it
 	$html = inflateLinks($html);
@@ -651,107 +651,80 @@ function postprocessCommentHtml($html)
  */
 function trimHtml($html)
 {
-	if (!$html) return '';
+	$html = trim($html);
 
-	$doc = \Dom\HTMLDocument::createFromString('<body>'.$html.'</body>', LIBXML_HTML_NOIMPLIED | LIBXML_NOERROR);
+	if(!$html) return '';
+
+	$doc = \Dom\HTMLDocument::createFromString('<body>'.$html.'</body>', LIBXML_HTML_NOIMPLIED | LIBXML_NOERROR, 'UTF-8'); // :WrapUnwrapForDomParser
 	$body = $doc->getElementsByTagName('body')->item(0);
-	if (!$body) return $html;
+	if(!$body) return '';
 
-	if (!_trimEmptyEdges($body)) return $html;
+	$trimmed  = _trimEmptyEdgeNodes($body, true);
+	$trimmed |= _trimEmptyEdgeNodes($body, false);
 
-	$result = '';
-	foreach ($body->childNodes as $child) {
-		$result .= $doc->saveHtml($child);
-	}
-	return $result;
-}
+	if(!$trimmed) return $html;
 
-/** Recursively trims visually-empty edges (leading and trailing) from a container.
- * Removes empty blocks, bare br, whitespace text nodes from both ends,
- * then recurses into remaining block children to trim their edges too.
- * @param \Dom\Node $parent
- * @return bool true if any modifications were made.
- */
-function _trimEmptyEdges($parent) : bool
-{
-	$trimmed = _trimEmptyEdgeNodes($parent, true);
-	$trimmed = _trimEmptyEdgeNodes($parent, false) || $trimmed;
-
-	foreach (iterator_to_array($parent->childNodes) as $child) {
-		if ($child->nodeType === XML_ELEMENT_NODE
-			&& ($child->localName === 'p' || $child->localName === 'div' || $child->localName === 'blockquote')
-		) {
-			$trimmed = _trimEmptyEdges($child) || $trimmed;
-		}
-	}
-	return $trimmed;
+	$result = $doc->saveHtml($body);
+	return $result ? substr($result, 6, -7) : ''; // :WrapUnwrapForDomParser
 }
 
 /** Removes visually-empty nodes from one end of a container.
- * @param \Dom\Node $parent
+ * @param \Dom\Node $node
  * @param bool $fromStart true = trim leading, false = trim trailing.
  * @return bool true if anything was removed.
  */
-function _trimEmptyEdgeNodes($parent, $fromStart) : bool
+function _trimEmptyEdgeNodes($node, $fromStart)
 {
 	$trimmed = false;
-	while ($parent->hasChildNodes()) {
-		$node = $fromStart ? $parent->firstChild : $parent->lastChild;
+	while($node->hasChildNodes()) {
+		$child = $fromStart ? $node->firstChild : $node->lastChild;
 
-		if ($node->nodeType === XML_TEXT_NODE) {
-			if (preg_match('/^[\s\pC]*$/u', $node->textContent)) {
-				$parent->removeChild($node);
-				$trimmed = true;
-				continue;
-			}
-			break;
-		}
-
-		if ($node->nodeType !== XML_ELEMENT_NODE) {
-			$parent->removeChild($node);
+		if(_isVisuallyEmpty($child)) {
+			$node->removeChild($child);
 			$trimmed = true;
 			continue;
 		}
 
-		if ($node->localName === 'br') {
-			$parent->removeChild($node);
-			$trimmed = true;
-			continue;
-		}
-
-		if (($node->localName === 'p' || $node->localName === 'div' || $node->localName === 'blockquote') && _isVisuallyEmpty($node)) {
-			$parent->removeChild($node);
-			$trimmed = true;
-			continue;
-		}
+		$trimmed |= _trimEmptyEdgeNodes($child, $fromStart);
 
 		break;
 	}
 	return $trimmed;
 }
 
-/** Determines if a DOM element contains no visible content.
- * @param \Dom\Element $element
+/**
+ * @param \Dom\Node $node
  * @return bool
  */
-function _isVisuallyEmpty($element) : bool
+function _isVisuallyEmpty($node)
 {
-	foreach ($element->childNodes as $child) {
-		if ($child->nodeType === XML_TEXT_NODE) {
-			if (!preg_match('/^[\s\pC]*$/u', $child->textContent)) return false;
-			continue;
-		}
-		if ($child->nodeType === XML_ELEMENT_NODE) {
-			if ($child->localName === 'br') continue;
-			if ($child->localName === 'img' || $child->localName === 'iframe' || $child->localName === 'hr') return false;
-			if (!_isVisuallyEmpty($child)) return false;
-		}
+	switch($node->nodeType) {
+		case XML_TEXT_NODE:
+			return preg_match('/^[\s\pC]*$/u', $node->textContent);
+
+		case XML_ELEMENT_NODE:
+			switch($node->nodeName) {
+				// "empty" nodes that are not visually empty:
+				case 'IMG': case 'IFRAME': case 'HR':
+					return false;
+
+				default:
+					if(!$node->hasChildNodes()) return true;
+
+					foreach($node->childNodes as $child) {
+						if(!_isVisuallyEmpty($child)) return false;
+					}
+
+					return true;
+			}
+
+		default:
+			return false;
 	}
-	return true;
 }
 
 /** Inflates links in text and anchor tags into iframes, images and/or anchor tags depending on the url.
- * @param string html
+ * @param string $html
  */
 function inflateLinks($html)
 {

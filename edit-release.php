@@ -134,7 +134,7 @@ else if(!empty($_POST['save'])) {
 
 
 	if(isset($_POST['text'])) {
-		$newData['text'] = sanitizeHtml($_POST['text']);
+		$newData['text'] = trimHtml(sanitizeHtml($_POST['text']));
 
 		$textLen = strlen($newData['text']);
 		if($textLen > 65535) { // TEXT column max length in assets.text

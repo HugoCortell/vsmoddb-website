@@ -205,7 +205,7 @@ else if(!empty($_POST['save'])) {
 	}
 
 	//TODO(Rennorb) @ux: Feedback
-	$mod['text'] = trim(sanitizeHtml($_POST['text']));
+	$mod['text'] = trimHtml(sanitizeHtml($_POST['text']));
 
 	$textLen = strlen($mod['text']);
 	if($textLen > 65535) { // TEXT column max length in assets.text

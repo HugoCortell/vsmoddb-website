@@ -12,7 +12,9 @@ if (!canEditProfile($shownUser, $user)) showErrorPage(HTTP_FORBIDDEN);
 if (!empty($_POST['save'])) {
 	validateActionToken();
 
-	$ok = $con->execute('UPDATE users SET bio = ? WHERE userId = ?', [sanitizeHtml($_POST['bio']), $shownUser['userId']]);
+	$bio = trimHtml(sanitizeHtml($_POST['bio']));
+
+	$ok = $con->execute('UPDATE users SET bio = ? WHERE userId = ?', [, $shownUser['userId']]);
 	if ($ok) {
 		// addMessage(MSG_CLASS_OK, 'New profile information saved.');
 
