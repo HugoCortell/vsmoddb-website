@@ -31,7 +31,7 @@
 
 	<link nonce="{$cspNonce}" href="/web/css/style.css?version=99" rel="stylesheet" type="text/css">
 
-	{if isset($assetserver) && startsWith($assetserver, 'http')}<link rel="dns-prefetch" href="{$assetserver}" />{/if}
+	{if isset($assetserver) && str_starts_with($assetserver, 'http')}<link rel="dns-prefetch" href="{$assetserver}" />{/if}
 
 	<script nonce="{$cspNonce}" type="text/javascript" src="/web/js/jquery-1.11.1.min.js"></script>
 	<script nonce="{$cspNonce}" type="text/javascript" src="/web/js/chosen/chosen.jquery.min.js?v=3"></script>
@@ -101,6 +101,6 @@
 			{/if}
 		</nav>
 
-		<div id="message-container">{foreach from=$messages item=message}<div class="{$message['class']}">{$message['html']}{if !contains($message['class'], 'permanent')}<span class="dismiss"></span>{/if}</div>{/foreach}</div>
+		<div id="message-container">{foreach from=$messages item=message}<div class="{$message['class']}">{$message['html']}{if !str_contains($message['class'], 'permanent')}<span class="dismiss"></span>{/if}</div>{/foreach}</div>
 
 		<main class="{$hclass ?? 'innercontent padded'}">

@@ -224,7 +224,7 @@
 							<td>
 								<div class="tags">
 								{foreach from=$release['compatibleGameVersionsFolded'] item=versionStr}
-									{if contains($versionStr, ' - ')}<span class="tag">{$versionStr}</span>
+									{if str_contains($versionStr, ' - ')}<span class="tag">{$versionStr}</span>
 									{else}<a href="/list/mod?gv[]={$versionStr}" class="tag" rel="tag">{$versionStr}</a>{/if}
 								{/foreach}
 								</div>
