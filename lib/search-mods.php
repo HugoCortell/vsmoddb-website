@@ -142,7 +142,7 @@ function validateModSearchInputs(&$outParams, $trimText)
 
 	if(!empty($_REQUEST['limit'])) {
 		$limit = intval($_REQUEST['limit']);
-		$clampedLimit = max(1, min($limit, MOD_SEARCH_MAX_LIMIT));
+		$clampedLimit = max(MOD_SEARCH_VALIDATE_LIMIT_MIN, min($limit, MOD_SEARCH_VALIDATE_LIMIT_MAX));
 		if($limit !== $clampedLimit) {
 			return "Invalid entry limit: '{$_REQUEST['limit']}'";
 		}

@@ -36,7 +36,6 @@ if (strstr($_SERVER["SERVER_NAME"], "mods.vintagestory.stage")) {
 
 	_define_default("MOD_SEARCH_INITIAL_RESULTS", 10);
 	_define_default("MOD_SEARCH_PAGE_SIZE", 10);
-	_define_default("MOD_SEARCH_MAX_LIMIT", 20);
 
 	_define_default("DOWNLOAD_DEDUPLICATION_TIMESPAN", 60); // seconds
 } else {
@@ -54,7 +53,6 @@ if (strstr($_SERVER["SERVER_NAME"], "mods.vintagestory.stage")) {
 
 	_define_default("MOD_SEARCH_INITIAL_RESULTS", 200);
 	_define_default("MOD_SEARCH_PAGE_SIZE", 200);
-	_define_default("MOD_SEARCH_MAX_LIMIT", 20);
 
 	_define_default("DOWNLOAD_DEDUPLICATION_TIMESPAN", 24*3600); // seconds
 }
@@ -65,3 +63,6 @@ _define_default('DISABLE_USER_TAGS', true);
 define("TAG_MODAUTHOR_VOTES", 1); // Not yet fully implemented, keep this at one.
 _define_default("TAG_DOWNVOTED_THRESHOLD", 0);
 _define_default("TAG_HIDE_THRESHOLD", -20);
+
+_define_default("MOD_SEARCH_VALIDATE_LIMIT_MIN", 1);
+_define_default("MOD_SEARCH_VALIDATE_LIMIT_MAX", 20);
