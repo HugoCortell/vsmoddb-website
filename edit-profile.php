@@ -14,7 +14,7 @@ if (!empty($_POST['save'])) {
 
 	$bio = trimHtml(sanitizeHtml($_POST['bio']));
 
-	$ok = $con->execute('UPDATE users SET bio = ? WHERE userId = ?', [, $shownUser['userId']]);
+	$ok = $con->execute('UPDATE users SET bio = ? WHERE userId = ?', [$bio, $shownUser['userId']]);
 	if ($ok) {
 		// addMessage(MSG_CLASS_OK, 'New profile information saved.');
 

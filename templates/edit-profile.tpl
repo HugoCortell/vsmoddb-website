@@ -10,7 +10,7 @@
 
 	<input type="hidden" name="at" value="{$user['actionToken']}">
 	<div style="width: 100%; padding: 0 1em">
-		<div class="editbox" style="width: 100%; min-height: 400px;">
+		<div class="editbox" style="width: 100%; min-height: 235px;">
 			<label>Bio</label>
 			<textarea name="bio" class="editor" data-editorname="bio">{$bio}</textarea>
 		</div>
