@@ -1002,9 +1002,10 @@ const TAG_KIND_USER_DEFINED = 3;
 // CATEGORY_GAME_MOD & CATEGORY__MASK === CATEGORY_SERVER_TWEAK & CATEGORY__MASK
 const CATEGORY__MASK = 0b01111111;
 
-const CATEGORY_GAME_MOD      = 0;
-const CATEGORY_EXTERNAL_TOOL = 1;
-const CATEGORY_OTHER         = 2;
+const CATEGORY_NOT_SPECIFIED = 0; // Used to force the user to select something, not a valid value in the db.
+const CATEGORY_GAME_MOD      = 1;
+const CATEGORY_EXTERNAL_TOOL = 2;
+const CATEGORY_OTHER         = 3;
 const CATEGORY_SERVER_TWEAK  = CATEGORY_GAME_MOD | (1 << 7);
 
 const ASSETTYPE_MOD = 1;

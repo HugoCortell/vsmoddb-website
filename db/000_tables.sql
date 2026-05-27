@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `mods` (
   `trendingPoints`        INT          NOT NULL DEFAULT 0,
   `comments`              INT          NOT NULL DEFAULT 0,
   `side`                  ENUM('client', 'server', 'both') NULL,
-  `category`              TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `category`              TINYINT UNSIGNED NOT NULL,
   `uploadLimitOverwrite`  INT              NULL,
   `lastReleased`          DATETIME         NULL,
   `created`               DATETIME     NOT NULL DEFAULT NOW(),

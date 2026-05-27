@@ -35,6 +35,7 @@ if(isset($_GET['assetid'])) {
 	$mod['assetTypeId'] = ASSETTYPE_MOD;
 	if(!canEditAsset($mod, $user)) showErrorPage(HTTP_FORBIDDEN);
 
+	$mod['category'] = intval($mod['category']);
 	$mod['tags'] = $con->getAssoc('SELECT t.tagId, t.name, t.color, mt.votes FROM modTags mt JOIN tags t ON t.tagId = mt.tagId WHERE modId = ?', $mod['modId']);
 
 	$canEditAsOwner = canEditAsset($mod, $user, false);
@@ -70,7 +71,7 @@ else { // New mod
 		'modId'           => 0,
 		'assetTypeId'     => ASSETTYPE_MOD,
 		'statusId'        => STATUS_DRAFT,
-		'category'        => CATEGORY_GAME_MOD,
+		'category'        => CATEGORY_NOT_SPECIFIED,
 		'side'            => 'both',
 		'name'            => '',
 		'summary'         => '',
@@ -102,6 +103,7 @@ $stati = [
 if($mod['statusId'] == STATUS_LOCKED) $stati[STATUS_LOCKED] = 'Locked';
 
 $modCategories = [
+	// CATEGORY_NOT_SPECIFIED skipped, it's not a valid input
 	CATEGORY_GAME_MOD      => 'Game Mod',
 	CATEGORY_SERVER_TWEAK  => 'Server-Specific Tweak',
 	CATEGORY_EXTERNAL_TOOL => 'External Tool',
@@ -150,7 +152,7 @@ else if(!empty($_POST['save'])) {
 
 	$mod['category'] = intval($_POST['category']);
 	if(!in_array($mod['category'], array_keys($modCategories), true)) {
-		addMessage(MSG_CLASS_WARN, "The new mod category is not valid and has been reset.");
+		addMessage(MSG_CLASS_WARN, $mod['category'] === CATEGORY_NOT_SPECIFIED ? "You must select a category." : "The mod category is not valid and has been reset.");
 		$mod['category'] = $oldModData['category'];
 	}
 
