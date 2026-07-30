@@ -890,7 +890,7 @@ function formatDownloadTrackingUrl($file)
 function maybeFormatDownloadTrackingUrlDependingOnFileExt($file)
 {
 	switch($file['ext']) {
-		case 'png': case 'jpg': case 'gif':
+		case 'png': case 'jpg': case 'gif': case 'webp':
 			return formatCdnDownloadUrl($file);
 
 		default:

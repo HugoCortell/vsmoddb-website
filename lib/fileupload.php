@@ -102,7 +102,7 @@ function processFileUpload($file, $assetTypeId, $parentAssetId, $parentModId) {
 	$acceptedImage = false;
 
 	list($width, $height, $type, $attr) = getimagesize($file["tmp_name"]);
-	if ($type == IMAGETYPE_GIF || $type == IMAGETYPE_JPEG || $type == IMAGETYPE_PNG) {
+	if ($type == IMAGETYPE_GIF || $type == IMAGETYPE_JPEG || $type == IMAGETYPE_PNG || $type == IMAGETYPE_WEBP) {
 		if ($width > 1920 || $height > 1080) {
 			unlink($localPath);
 			return array("status" => "error", "errormessage" => 'Image too large! Limit is 1920x1080 pixels');

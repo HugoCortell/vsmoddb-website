@@ -52,7 +52,8 @@ function copyImageResized($file, $width = 0, $height = 0, $proportional = true, 
 	
 	if ($info[2] != IMAGETYPE_GIF && 
 		$info[2] != IMAGETYPE_JPEG && 
-		$info[2] != IMAGETYPE_PNG) return false;
+		$info[2] != IMAGETYPE_PNG &&
+		$info[2] != IMAGETYPE_WEBP) return false;
 	
 	$filename = NULL;
 	switch (strtolower($output)) {
@@ -109,6 +110,9 @@ function copyImageResized($file, $width = 0, $height = 0, $proportional = true, 
 	  case IMAGETYPE_PNG:
 		$image = imagecreatefrompng($file);
 	  break;
+	  case IMAGETYPE_WEBP:
+		$image = imagecreatefromwebp($file);
+	  break;
 	  default:
 		return false;
 	}
@@ -119,7 +123,7 @@ function copyImageResized($file, $width = 0, $height = 0, $proportional = true, 
 		$image_resized = imagecreatetruecolor( $final_width, $final_height );
 	}
  
-	if (($info[2] == IMAGETYPE_GIF) || ($info[2] == IMAGETYPE_PNG)) {
+	if (($info[2] == IMAGETYPE_GIF) || ($info[2] == IMAGETYPE_PNG) || ($info[2] == IMAGETYPE_WEBP)) {
 		$trnprt_indx = imagecolortransparent($image);
 
 		// If we have a specific transparent color
@@ -136,8 +140,8 @@ function copyImageResized($file, $width = 0, $height = 0, $proportional = true, 
 			// Set the background color for new image to transparent
 			imagecolortransparent($image_resized, $trnprt_indx);
 	 
-		// Always make a transparent background color for PNGs that don't have one allocated already
-		} elseif ($info[2] == IMAGETYPE_PNG) {
+		// Always make a transparent background color for PNGs and WEBPs that don't have one allocated already
+		} elseif ($info[2] == IMAGETYPE_PNG || $info[2] == IMAGETYPE_WEBP) {
 	   
 			// Turn off transparency blending (temporarily)
 			imagealphablending($image_resized, false);
@@ -159,7 +163,7 @@ function copyImageResized($file, $width = 0, $height = 0, $proportional = true, 
 	
 		fastimagecopyresampled($image_resized, $image, 0, 0, $crop['x'] * $propX, $crop['y'] * $propY, $crop['w'], $crop['h'], $crop['w'] * $propX, $crop['h'] * $propY);
 	} else {
-		if ($info[2] == IMAGETYPE_PNG) {
+		if ($info[2] == IMAGETYPE_PNG || $info[2] == IMAGETYPE_WEBP) {
 			imagecopyresampled ($image_resized, $image, 0, 0, 0, 0, $final_width, $final_height, $width_old, $height_old);
 		} else {
 			fastimagecopyresampled($image_resized, $image, 0, 0, 0, 0, $final_width, $final_height, $width_old, $height_old);
@@ -179,6 +183,11 @@ function copyImageResized($file, $width = 0, $height = 0, $proportional = true, 
 			
 		case IMAGETYPE_PNG:
 			if(!imagepng($image_resized, $filename))
+				return false;
+			break;
+			
+		case IMAGETYPE_WEBP:
+			if(!imagewebp($image_resized, $filename, 95))
 				return false;
 			break;
 			
@@ -210,6 +219,7 @@ function cropImage($pathIn, $pathOut, $x, $y, $w, $h) {
 	  case IMAGETYPE_GIF : $imageSrc = imagecreatefromgif($pathIn);  break;
 	  case IMAGETYPE_JPEG: $imageSrc = imagecreatefromjpeg($pathIn); break;
 	  case IMAGETYPE_PNG : $imageSrc = imagecreatefrompng($pathIn);  break;
+	  case IMAGETYPE_WEBP: $imageSrc = imagecreatefromwebp($pathIn); break;
 	  default: return false;
 	}
 
@@ -220,6 +230,7 @@ function cropImage($pathIn, $pathOut, $x, $y, $w, $h) {
 		case IMAGETYPE_GIF : if(!imagegif($imageDst, $pathOut))      return false; break;
 		case IMAGETYPE_JPEG: if(!imagejpeg($imageDst, $pathOut, 95)) return false; break;
 		case IMAGETYPE_PNG : if(!imagepng($imageDst, $pathOut))      return false; break;
+		case IMAGETYPE_WEBP: if(!imagewebp($imageDst, $pathOut, 95)) return false; break;
 		default: return false;
 	}
 
