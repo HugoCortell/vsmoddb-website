@@ -8,9 +8,9 @@ ENV GID=${GID}
 
 # Install php-mysql driver & gd to handle screenshots
 RUN apt update \
-    && apt install -y zlib1g-dev libpng-dev libjpeg62-turbo-dev \
+    && apt install -y zlib1g-dev libpng-dev libjpeg62-turbo-dev libwebp-dev \
     && rm -rf /var/lib/apt/lists/*
-RUN docker-php-ext-configure gd --with-jpeg \
+RUN docker-php-ext-configure gd --with-jpeg --with-webp \
     && docker-php-ext-install mysqli pdo pdo_mysql gd
 
 RUN usermod -u ${UID} www-data \
