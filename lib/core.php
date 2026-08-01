@@ -818,7 +818,7 @@ function _inflateLink($link, $wrapUnmatchedLink)
 
 	$lastDot = strrpos($path, '.');
 	if($lastDot !== false && $lastDot + 1 < strlen($path)) {
-		if(in_array(substr($path, $lastDot + 1), ['png', 'jpg', 'jpeg', 'gif', 'bmp'])) {
+		if(in_array(substr($path, $lastDot + 1), ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'])) {
 			$safeLink = str_replace("'", "%27", $link); // @security: We escape the single quote to prevent the link form being able to escape the href in the anchor tag.
 			return "<a target='_blank'{$relAttr} href='$safeLink'><img src='$safeLink' alt='' /></a>";
 		}

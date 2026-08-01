@@ -389,6 +389,13 @@ else if(!empty($_POST['save'])) {
 			break;
 		}
 
+		// Since 480x480 images are already valid logos, keep animated WebP intact instead of sending it through GD, as it can't handle animated WebPs.
+		if(isAnimatedWebp($originalFileLocalPath)) {
+			unlink($originalFileLocalPath);
+			$mod['embedLogoFileId'] = $dbImage['fileId'];
+			break;
+		}
+
 		$croppedFileLocalPath = tempnam(sys_get_temp_dir(), '');
 		$cropResult = cropImage($originalFileLocalPath, $croppedFileLocalPath, 0, 0, 480, 320);
 		unlink($originalFileLocalPath);

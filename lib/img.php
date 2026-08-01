@@ -6,6 +6,16 @@
  * @param string $ext file ext
  * @return array{status:'ok'|'error', errormessage?: string, cdnthumbnailpath?: stirng}
  */
+function isAnimatedWebp($file) {
+	$header = @file_get_contents($file, false, null, 0, 21);
+	return $header !== false
+		&& strlen($header) >= 21
+		&& substr($header, 0, 4) === 'RIFF'
+		&& substr($header, 8, 4) === 'WEBP'
+		&& substr($header, 12, 4) === 'VP8X'
+		&& (ord($header[20]) & 0x02) !== 0;
+}
+
 function createThumbnailAndUploadToCDN($localpath, $cdnbasepath, $ext) {
 	$localthumbnailfilename = tempnam(sys_get_temp_dir(), '');
 
@@ -116,6 +126,7 @@ function copyImageResized($file, $width = 0, $height = 0, $proportional = true, 
 	  default:
 		return false;
 	}
+	if (!$image) return false;
 
 	if ($crop) {
 		$image_resized = imagecreatetruecolor( $crop['w'], $crop['h'] );
@@ -222,6 +233,7 @@ function cropImage($pathIn, $pathOut, $x, $y, $w, $h) {
 	  case IMAGETYPE_WEBP: $imageSrc = imagecreatefromwebp($pathIn); break;
 	  default: return false;
 	}
+	if (!$imageSrc) return false;
 
 	$imageDst = imagecreatetruecolor($w, $h);
 	fastimagecopyresampled($imageDst, $imageSrc, 0, 0, $x, $y, $w, $h, $w, $h);

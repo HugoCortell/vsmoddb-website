@@ -100,6 +100,7 @@ function processFileUpload($file, $assetTypeId, $parentAssetId, $parentModId) {
 	if($parentAssetId) $data["assetId"] = $parentAssetId;
 
 	$acceptedImage = false;
+	$hasThumbnail = false;
 
 	list($width, $height, $type, $attr) = getimagesize($file["tmp_name"]);
 	if ($type == IMAGETYPE_GIF || $type == IMAGETYPE_JPEG || $type == IMAGETYPE_PNG || $type == IMAGETYPE_WEBP) {
@@ -108,10 +109,14 @@ function processFileUpload($file, $assetTypeId, $parentAssetId, $parentModId) {
 			return array("status" => "error", "errormessage" => 'Image too large! Limit is 1920x1080 pixels');
 		}
 
-		$thumbStatus = createThumbnailAndUploadToCDN($localPath, $cdnBasePath, $ext);
-		if($thumbStatus['status'] !== 'ok') {
-			unlink($localPath);
-			return $thumbStatus;
+		// GD is entirely incapable of handling animated WebP, so we omit generating an editor thumbnail. Everything else just works.
+		if ($type != IMAGETYPE_WEBP || !isAnimatedWebp($localPath)) {
+			$thumbStatus = createThumbnailAndUploadToCDN($localPath, $cdnBasePath, $ext);
+			if($thumbStatus['status'] !== 'ok') {
+				unlink($localPath);
+				return $thumbStatus;
+			}
+			$hasThumbnail = true;
 		}
 
 		$acceptedImage = true;
@@ -129,7 +134,7 @@ function processFileUpload($file, $assetTypeId, $parentAssetId, $parentModId) {
 	$con->execute("INSERT INTO files (`$foldedKeys`) VALUES ($placeholders)", array_values($data));
 	$fileId = $con->Insert_ID();
 	if($acceptedImage) {
-		$con->execute("INSERT INTO fileImageData (fileId, hasThumbnail, size) VALUES (?, 1, POINT(?, ?))", [$fileId, $width, $height]);
+		$con->execute("INSERT INTO fileImageData (fileId, hasThumbnail, size) VALUES (?, ?, POINT(?, ?))", [$fileId, intval($hasThumbnail), $width, $height]);
 	}
 
 	if($parentAssetId) logAssetChanges(array("Uploaded file '{$file['name']}'"), $parentAssetId);
